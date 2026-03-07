@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:*)",
+      "Bash(npx ng build:*)",
+      "Bash(npm start)",
+      "Bash(npx kill-port:*)",
+      "Bash(npm install)",
+      "WebFetch(domain:github.com)",
+      "Read(//c/Users/MY/Downloads/flask_react_app/api/**)",
+      "WebSearch",
+      "WebFetch(domain:katoid.github.io)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

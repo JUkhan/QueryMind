@@ -1,0 +1,59 @@
+=== SCHEMA: DBO ===
+
+
+Table: customers
+Description: Represents customers data in the system.
+        customer_id (INTEGER, Primary Key)
+        name (VARCHAR) - customer name
+        email (VARCHAR)
+        registration_date (DATE)
+        last_login (DATETIME)
+
+Table: dashboard_gen_core
+Description: Represents dashboard gen core data in the system.
+        id (INTEGER, Primary Key)
+        title (VARCHAR(200), Not Null)
+        type (TEXT, Not Null)
+        query (TEXT, Not Null)
+        columns (TEXT, Not Null)
+        created_at (DATETIME)
+        user_id (VARCHAR(80), Not Null)
+        json_config (TEXT)
+
+Table: helpdesk_gen_core
+Description: Represents helpdesk gen core data in the system.
+        title (TEXT, Primary Key)
+        query_description (TEXT, Not Null)
+        query (TEXT)
+
+Table: order_items
+Description: Represents order items data in the system.
+        item_id (INTEGER, Primary Key)
+        order_id (INTEGER, Foreign Key -> orders.order_id)
+        product_id (INTEGER, Foreign Key -> products.product_id)
+        quantity (INTEGER)
+        unit_price (NUMERIC)
+
+Table: orders
+Description: Represents orders data in the system.
+        order_id (INTEGER, Primary Key)
+        customer_id (INTEGER, Foreign Key -> customers.customer_id)
+        order_date (DATE)
+        total_amount (NUMERIC)
+        status (VARCHAR)
+
+Table: products
+Description: Represents products data in the system.
+        product_id (INTEGER, Primary Key)
+        name (VARCHAR)
+        description (TEXT)
+        price (NUMERIC)
+        category (VARCHAR)
+        stock_quantity (INTEGER)
+
+Table: user_gen_core
+Description: Represents user gen core data in the system.
+        id (INTEGER, Primary Key)
+        username (VARCHAR(80), Not Null, Unique)
+        email (VARCHAR(120), Not Null, Unique)
+        created_at (DATETIME)

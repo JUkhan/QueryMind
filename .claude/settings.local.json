@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\Users\\MY\\Downloads\\flask_react_app\" /b)",
+      "Bash(pnpm add:*)",
+      "Bash(dir /b)",
+      "Bash(pnpm list:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,810 @@
+<div class="min-h-screen bg-gray-100 p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <p class="text-gray-600 mt-1">Manage your components dynamically</p>
+      </div>
+
+      <!-- Add Component Button -->
+      <div class="relative"></div>
+    </div>
+
+    <!-- Search Component -->
+
+    <!-- Components Grid -->
+    @if (components().length === 0) {
+    <div class="text-center py-12">
+      <div
+        class="inline-flex items-center justify-center w-16 h-16 bg-gray-200 rounded-full mb-4"
+      >
+        <svg
+          class="w-8 h-8 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          />
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No components yet</h3>
+      <p class="text-gray-500 mb-4">
+        Start building your dashboard by searching for data or adding components
+      </p>
+    </div>
+    } @if (components().length > 0) {
+    <ktd-grid
+      [cols]="cols()"
+      [rowHeight]="rowHeight()"
+      [layout]="gridLayout()"
+      [gap]="gap()"
+      [compactType]="'vertical'"
+      (layoutUpdated)="onLayoutUpdated($event)"
+      class="w-full"
+    >
+      @for (gridItem of gridComponents(); track gridItem.layout.id) {
+      <ktd-grid-item
+        [id]="gridItem.layout.id"
+        class="relative group/grid-item"
+        style="cursor: default !important"
+      >
+        <div class="relative h-full cursor-default">
+          <!-- Drag Handle - Small icon at top left corner, visible on hover -->
+          <div
+            ktdGridDragHandle
+            class="absolute top-2 left-2 p-2 bg-gray-200/90 hover:bg-gray-300 rounded cursor-move z-20 opacity-0 group-hover/grid-item:opacity-100 transition-opacity"
+            title="Drag to move component"
+          >
+            <svg
+              class="w-4 h-4 text-gray-600"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+              ></path>
+            </svg>
+          </div>
+
+          @switch (gridItem.component.type) { @case ('line') {
+          <!-- Line Chart -->
+          <app-line-chart
+            [id]="gridItem.component.id"
+            [title]="gridItem.component.title"
+            [(data)]="gridItem.component.data"
+            [(columns)]="gridItem.component.columns"
+            [type]="gridItem.component.type"
+            [query]="gridItem.component.query"
+            [isQueryEditable]="gridItem.component.isQueryEditable"
+            [json_config]="gridItem.component.json_config"
+            (onRemove)="removeComponent(gridItem.component.id)"
+            (onEdit)="
+              startEditing(gridItem.component.id, gridItem.component.title)
+            "
+            (onToggleQueryEditable)="toggleQueryEditable(gridItem.component.id)"
+          ></app-line-chart>
+          } @case ('bar') {
+          <!-- Bar Chart -->
+          <app-bar-chart
+            [id]="gridItem.component.id"
+            [title]="gridItem.component.title"
+            [(data)]="gridItem.component.data"
+            [(columns)]="gridItem.component.columns"
+            [type]="gridItem.component.type"
+            [query]="gridItem.component.query"
+            [isQueryEditable]="gridItem.component.isQueryEditable"
+            [json_config]="gridItem.component.json_config"
+            (onRemove)="removeComponent(gridItem.component.id)"
+            (onEdit)="
+              startEditing(gridItem.component.id, gridItem.component.title)
+            "
+            (onToggleQueryEditable)="toggleQueryEditable(gridItem.component.id)"
+          ></app-bar-chart>
+          } @case ('pie') {
+          <!-- Pie Chart -->
+          <app-pie-chart
+            [id]="gridItem.component.id"
+            [title]="gridItem.component.title"
+            [(data)]="gridItem.component.data"
+            [(columns)]="gridItem.component.columns"
+            [query]="gridItem.component.query"
+            [type]="gridItem.component.type"
+            [isQueryEditable]="gridItem.component.isQueryEditable"
+            [json_config]="gridItem.component.json_config"
+            (onRemove)="removeComponent(gridItem.component.id)"
+            (onEdit)="
+              startEditing(gridItem.component.id, gridItem.component.title)
+            "
+            (onToggleQueryEditable)="toggleQueryEditable(gridItem.component.id)"
+          ></app-pie-chart>
+          } @case ('donut') {
+          <!-- Donut Chart (using pie chart component) -->
+          <app-pie-chart
+            [id]="gridItem.component.id"
+            [title]="gridItem.component.title"
+            [(data)]="gridItem.component.data"
+            [(columns)]="gridItem.component.columns"
+            [query]="gridItem.component.query"
+            [type]="gridItem.component.type"
+            [isQueryEditable]="gridItem.component.isQueryEditable"
+            [json_config]="gridItem.component.json_config"
+            (onRemove)="removeComponent(gridItem.component.id)"
+            (onEdit)="
+              startEditing(gridItem.component.id, gridItem.component.title)
+            "
+            (onToggleQueryEditable)="toggleQueryEditable(gridItem.component.id)"
+          ></app-pie-chart>
+          } @case ('table') {
+          <!-- Table Component -->
+          <app-table-component
+            [id]="gridItem.component.id"
+            [title]="gridItem.component.title"
+            [(data)]="gridItem.component.data"
+            [(columns)]="gridItem.component.columns"
+            [query]="gridItem.component.query"
+            [type]="gridItem.component.type"
+            [isQueryEditable]="gridItem.component.isQueryEditable"
+            [json_config]="gridItem.component.json_config"
+            (onRemove)="removeComponent(gridItem.component.id)"
+            (onEdit)="
+              startEditing(gridItem.component.id, gridItem.component.title)
+            "
+            (onColumnsChange)="
+              handleColumnsChange(gridItem.component.id, $event)
+            "
+            (onToggleQueryEditable)="toggleQueryEditable(gridItem.component.id)"
+            (onConfigChange)="handleConfigChange(gridItem.component.id, $event)"
+          ></app-table-component>
+          } @default {
+          <!-- Fallback for unknown component types -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-center text-red-600">
+              <p class="font-semibold">
+                Unknown component type: {{ gridItem.component.type }}
+              </p>
+              <p class="text-sm text-gray-500 mt-2">
+                This component type is not supported.
+              </p>
+            </div>
+          </div>
+          } }
+        </div>
+      </ktd-grid-item>
+      }
+    </ktd-grid>
+    }
+
+    <!-- Edit Modal -->
+    @if (editingComponent()) {
+    <div
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4"
+    >
+      <div
+        class="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+      >
+        <h3 class="text-xl font-bold mb-6 text-gray-800">
+          {{ isEditingTable() ? "Configure Table" : "Configure Chart" }}
+        </h3>
+
+        <!-- Title -->
+        <div class="mb-6">
+          <label class="block text-sm font-semibold text-gray-700 mb-2"
+            >Title</label
+          >
+          <input
+            type="text"
+            [ngModel]="editTitle()"
+            (ngModelChange)="editTitle.set($event)"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter chart title"
+          />
+        </div>
+
+        @if (editChartConfig()) {
+        <div class="space-y-6">
+          <!-- Chart Settings (only for non-table components) -->
+          @if (!isEditingTable()) {
+          <!-- Common Settings -->
+          <div class="border-b pb-4">
+            <h4 class="text-lg font-semibold mb-3 text-gray-700">
+              Display Settings
+            </h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showLegend"
+                  [checked]="editChartConfig().showLegend"
+                  (change)="
+                    updateChartConfig('showLegend', $any($event.target).checked)
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="showLegend" class="ml-2 text-sm text-gray-700"
+                  >Show Legend</label
+                >
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Legend Position</label
+                >
+                <select
+                  [value]="editChartConfig().legendPosition"
+                  (change)="
+                    updateChartConfig(
+                      'legendPosition',
+                      $any($event.target).value
+                    )
+                  "
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="top">Top</option>
+                  <option value="bottom">Bottom</option>
+                  <option value="left">Left</option>
+                  <option value="right">Right</option>
+                </select>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showTooltip"
+                  [checked]="editChartConfig().showTooltip"
+                  (change)="
+                    updateChartConfig(
+                      'showTooltip',
+                      $any($event.target).checked
+                    )
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="showTooltip" class="ml-2 text-sm text-gray-700"
+                  >Show Tooltip</label
+                >
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="responsive"
+                  [checked]="editChartConfig().responsive"
+                  (change)="
+                    updateChartConfig('responsive', $any($event.target).checked)
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="responsive" class="ml-2 text-sm text-gray-700"
+                  >Responsive</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Animation Settings -->
+          <div class="border-b pb-4">
+            <h4 class="text-lg font-semibold mb-3 text-gray-700">Animation</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="animationEnabled"
+                  [checked]="editChartConfig().animationEnabled"
+                  (change)="
+                    updateChartConfig(
+                      'animationEnabled',
+                      $any($event.target).checked
+                    )
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="animationEnabled" class="ml-2 text-sm text-gray-700"
+                  >Enable Animation</label
+                >
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Duration (ms)</label
+                >
+                <input
+                  type="number"
+                  [value]="editChartConfig().animationDuration"
+                  (input)="
+                    updateChartConfig(
+                      'animationDuration',
+                      +$any($event.target).value
+                    )
+                  "
+                  min="0"
+                  max="5000"
+                  step="100"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div class="col-span-2">
+                <label class="block text-sm text-gray-700 mb-1">Easing</label>
+                <select
+                  [value]="editChartConfig().animationEasing"
+                  (change)="
+                    updateChartConfig(
+                      'animationEasing',
+                      $any($event.target).value
+                    )
+                  "
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="linear">Linear</option>
+                  <option value="easeInQuad">Ease In Quad</option>
+                  <option value="easeOutQuad">Ease Out Quad</option>
+                  <option value="easeInOutQuad">Ease In/Out Quad</option>
+                  <option value="easeInCubic">Ease In Cubic</option>
+                  <option value="easeOutCubic">Ease Out Cubic</option>
+                  <option value="easeInOutCubic">Ease In/Out Cubic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Settings -->
+          <div class="border-b pb-4">
+            <h4 class="text-lg font-semibold mb-3 text-gray-700">Colors</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Color Scheme</label
+                >
+                <select
+                  [value]="editChartConfig().colorScheme"
+                  (change)="
+                    updateChartConfig('colorScheme', $any($event.target).value)
+                  "
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="default">Default</option>
+                  <option value="pastel">Pastel</option>
+                  <option value="vibrant">Vibrant</option>
+                  <option value="monochrome">Monochrome</option>
+                  <option value="cool">Cool</option>
+                  <option value="warm">Warm</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Border Width</label
+                >
+                <input
+                  type="number"
+                  [value]="editChartConfig().borderWidth"
+                  (input)="
+                    updateChartConfig('borderWidth', +$any($event.target).value)
+                  "
+                  min="0"
+                  max="10"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Type Specific Settings -->
+          @if (editChartConfig().showGrid !== undefined) {
+          <!-- Line/Bar Chart Settings -->
+          <div class="border-b pb-4">
+            <h4 class="text-lg font-semibold mb-3 text-gray-700">
+              Axes & Grid
+            </h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showGrid"
+                  [checked]="editChartConfig().showGrid"
+                  (change)="
+                    updateChartConfig('showGrid', $any($event.target).checked)
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="showGrid" class="ml-2 text-sm text-gray-700"
+                  >Show Grid</label
+                >
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="beginAtZero"
+                  [checked]="editChartConfig().beginAtZero"
+                  (change)="
+                    updateChartConfig(
+                      'beginAtZero',
+                      $any($event.target).checked
+                    )
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="beginAtZero" class="ml-2 text-sm text-gray-700"
+                  >Begin at Zero</label
+                >
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showXAxis"
+                  [checked]="editChartConfig().showXAxis"
+                  (change)="
+                    updateChartConfig('showXAxis', $any($event.target).checked)
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="showXAxis" class="ml-2 text-sm text-gray-700"
+                  >Show X Axis</label
+                >
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showYAxis"
+                  [checked]="editChartConfig().showYAxis"
+                  (change)="
+                    updateChartConfig('showYAxis', $any($event.target).checked)
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="showYAxis" class="ml-2 text-sm text-gray-700"
+                  >Show Y Axis</label
+                >
+              </div>
+            </div>
+          </div>
+          } @if (editChartConfig().tension !== undefined) {
+          <!-- Line Chart Specific -->
+          <div class="border-b pb-4">
+            <h4 class="text-lg font-semibold mb-3 text-gray-700">
+              Line Settings
+            </h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Line Tension (Curve)</label
+                >
+                <input
+                  type="range"
+                  [value]="editChartConfig().tension"
+                  (input)="
+                    updateChartConfig('tension', +$any($event.target).value)
+                  "
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  class="w-full"
+                />
+                <span class="text-xs text-gray-500">{{
+                  editChartConfig().tension
+                }}</span>
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Point Radius</label
+                >
+                <input
+                  type="number"
+                  [value]="editChartConfig().pointRadius"
+                  (input)="
+                    updateChartConfig('pointRadius', +$any($event.target).value)
+                  "
+                  min="0"
+                  max="20"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="fill"
+                  [checked]="editChartConfig().fill"
+                  (change)="
+                    updateChartConfig('fill', $any($event.target).checked)
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="fill" class="ml-2 text-sm text-gray-700"
+                  >Fill Area</label
+                >
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Point Style</label
+                >
+                <select
+                  [value]="editChartConfig().pointStyle"
+                  (change)="
+                    updateChartConfig('pointStyle', $any($event.target).value)
+                  "
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="circle">Circle</option>
+                  <option value="cross">Cross</option>
+                  <option value="rect">Rectangle</option>
+                  <option value="rectRounded">Rounded Rectangle</option>
+                  <option value="star">Star</option>
+                  <option value="triangle">Triangle</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          } @if (editChartConfig().barThickness !== undefined) {
+          <!-- Bar Chart Specific -->
+          <div class="border-b pb-4">
+            <h4 class="text-lg font-semibold mb-3 text-gray-700">
+              Bar Settings
+            </h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Max Bar Thickness</label
+                >
+                <input
+                  type="number"
+                  [value]="editChartConfig().maxBarThickness"
+                  (input)="
+                    updateChartConfig(
+                      'maxBarThickness',
+                      +$any($event.target).value
+                    )
+                  "
+                  min="10"
+                  max="200"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+          } @if (editChartConfig().cutout !== undefined) {
+          <!-- Pie/Donut Chart Specific -->
+          <div class="border-b pb-4">
+            <h4 class="text-lg font-semibold mb-3 text-gray-700">
+              Pie/Donut Settings
+            </h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Cutout (for Donut)</label
+                >
+                <input
+                  type="text"
+                  [value]="editChartConfig().cutout"
+                  (input)="
+                    updateChartConfig('cutout', $any($event.target).value)
+                  "
+                  placeholder="e.g., 50%"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Rotation (degrees)</label
+                >
+                <input
+                  type="number"
+                  [value]="editChartConfig().rotation"
+                  (input)="
+                    updateChartConfig('rotation', +$any($event.target).value)
+                  "
+                  min="0"
+                  max="360"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Circumference (degrees)</label
+                >
+                <input
+                  type="number"
+                  [value]="editChartConfig().circumference"
+                  (input)="
+                    updateChartConfig(
+                      'circumference',
+                      +$any($event.target).value
+                    )
+                  "
+                  min="0"
+                  max="360"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+          } } @if (editChartConfig().showPagination !== undefined) {
+          <!-- Table Specific -->
+          <div class="border-b pb-4">
+            <h4 class="text-lg font-semibold mb-3 text-gray-700">
+              Table Settings
+            </h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showPagination"
+                  [checked]="editChartConfig().showPagination"
+                  (change)="
+                    updateChartConfig(
+                      'showPagination',
+                      $any($event.target).checked
+                    )
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="showPagination" class="ml-2 text-sm text-gray-700"
+                  >Show Pagination</label
+                >
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Page Size</label
+                >
+                <select
+                  [ngModel]="editChartConfig().pageSize"
+                  (ngModelChange)="updateChartConfig('pageSize', +$event)"
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option [value]="5">5 rows</option>
+                  <option [value]="10">10 rows</option>
+                  <option [value]="25">25 rows</option>
+                  <option [value]="50">50 rows</option>
+                  <option [value]="100">100 rows</option>
+                </select>
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="stripedRows"
+                  [checked]="editChartConfig().stripedRows"
+                  (change)="
+                    updateChartConfig(
+                      'stripedRows',
+                      $any($event.target).checked
+                    )
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="stripedRows" class="ml-2 text-sm text-gray-700"
+                  >Striped Rows</label
+                >
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="showBorders"
+                  [checked]="editChartConfig().showBorders"
+                  (change)="
+                    updateChartConfig(
+                      'showBorders',
+                      $any($event.target).checked
+                    )
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="showBorders" class="ml-2 text-sm text-gray-700"
+                  >Show Borders</label
+                >
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="hoverEffect"
+                  [checked]="editChartConfig().hoverEffect"
+                  (change)="
+                    updateChartConfig(
+                      'hoverEffect',
+                      $any($event.target).checked
+                    )
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="hoverEffect" class="ml-2 text-sm text-gray-700"
+                  >Hover Effect</label
+                >
+              </div>
+
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="denseLayout"
+                  [checked]="editChartConfig().denseLayout"
+                  (change)="
+                    updateChartConfig(
+                      'denseLayout',
+                      $any($event.target).checked
+                    )
+                  "
+                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                />
+                <label for="denseLayout" class="ml-2 text-sm text-gray-700"
+                  >Dense Layout</label
+                >
+              </div>
+
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Header Style</label
+                >
+                <select
+                  [value]="editChartConfig().headerStyle"
+                  (change)="
+                    updateChartConfig('headerStyle', $any($event.target).value)
+                  "
+                  class="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="default">Default</option>
+                  <option value="bold">Bold</option>
+                  <option value="colored">Colored</option>
+                </select>
+              </div>
+
+              @if (editChartConfig().headerStyle === 'colored') {
+              <div>
+                <label class="block text-sm text-gray-700 mb-1"
+                  >Header Color</label
+                >
+                <input
+                  type="color"
+                  [value]="editChartConfig().headerColor || '#3b82f6'"
+                  (input)="
+                    updateChartConfig('headerColor', $any($event.target).value)
+                  "
+                  class="w-full h-10 border border-gray-300 rounded-md"
+                />
+              </div>
+              }
+            </div>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 mt-6 pt-4 border-t">
+          <button
+            (click)="saveEdit()"
+            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors font-medium"
+          >
+            Save Changes
+          </button>
+          <button
+            (click)="cancelEdit()"
+            class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md transition-colors font-medium"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Click outside to close menu -->
+  @if (showAddMenu()) {
+  <div class="fixed inset-0 z-5" (click)="closeAddMenu()"></div>
+  }
+</div>

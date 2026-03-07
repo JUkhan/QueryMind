@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Select-Object Name, Status, DisplayName)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(powershell -Command \"Get-OdbcDriver | Where-Object {$_.Name -like ''*SQL*''} | Select-Object Name\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
