@@ -22,7 +22,7 @@ db_system=os.getenv('DB_SYSTEM', 'sqlite')
 class State(TypedDict):
   messages: Annotated[Sequence[BaseMessage], add_messages]
 
-llm = init_chat_model(model="gemini-3-flash-preview", temperature=0, model_provider='google_genai')
+llm = init_chat_model(model="gemini-3.5-flash", temperature=0, model_provider='google_genai')
 
 @tool
 def get_schema_detail(query_description: str):

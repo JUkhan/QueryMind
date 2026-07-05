@@ -51,11 +51,11 @@ CREATE TABLE order_items (
 
 -- Insert Data into Customers Table
 INSERT INTO customers (name, email, registration_date, last_login) VALUES
-('Alice Smith', 'alice.smith@example.com', '2023-01-15', '2024-08-15 10:00:00'),
-('Bob Johnson', 'bob.johnson@example.com', '2023-02-20', '2024-08-14 14:30:00'),
-('Charlie Brown', 'charlie.brown@example.com', '2023-03-10', '2024-08-13 08:00:00'),
-('Diana Miller', 'diana.miller@example.com', '2023-04-05', '2024-08-12 16:45:00'),
-('Eve Wilson', 'eve.wilson@example.com', '2023-05-01', '2024-08-11 12:00:00');
+('Alice Smith', 'alice.smith@example.com', '2025-01-15', '2026-08-15 10:00:00'),
+('Bob Johnson', 'bob.johnson@example.com', '2025-02-20', '2026-08-14 14:30:00'),
+('Charlie Brown', 'charlie.brown@example.com', '2025-03-10', '2026-08-13 08:00:00'),
+('Diana Miller', 'diana.miller@example.com', '2025-04-05', '2026-08-12 16:45:00'),
+('Eve Wilson', 'eve.wilson@example.com', '2025-05-01', '2026-08-11 12:00:00');
 
 -- Insert Data into Products Table
 INSERT INTO products (name, description, price, category, stock_quantity) VALUES
@@ -67,26 +67,26 @@ INSERT INTO products (name, description, price, category, stock_quantity) VALUES
 
 -- Insert Data into Orders Table (20 orders in the current year)
 INSERT INTO orders (customer_id, order_date, total_amount, status) VALUES
-(1, '2024-01-10', 1225.00, 'Completed'), -- Laptop + Mouse
-(2, '2024-02-15', 150.00, 'Completed'),  -- Office Chair
-(3, '2024-03-20', 50.00, 'Completed'),   -- Coffee Maker
-(4, '2024-04-01', 30.00, 'Completed'),   -- Desk Lamp
-(5, '2024-04-15', 1200.00, 'Completed'), -- Laptop
-(1, '2024-05-01', 75.00, 'Completed'),   -- 3 x Mouse
-(2, '2024-05-10', 300.00, 'Completed'),  -- 2 x Office Chair
-(3, '2024-06-01', 100.00, 'Completed'),  -- 2 x Coffee Maker
-(4, '2024-06-15', 60.00, 'Completed'),   -- 2 x Desk Lamp
-(5, '2024-07-01', 1225.00, 'Completed'), -- Laptop + Mouse
-(1, '2024-07-10', 2400.00, 'Processing'), -- 2 x Laptop
-(2, '2024-07-15', 175.00, 'Shipped'),      -- Office Chair + Mouse
-(3, '2024-07-20', 80.00, 'Shipped'),   -- Coffee Maker + Desk Lamp
-(4, '2024-08-01', 50.00, 'Pending'),   -- Coffee Maker
-(5, '2024-08-05', 30.00, 'Pending'),      -- Desk Lamp
-(1, '2024-08-10', 1200.00, 'Completed'),  -- Laptop
-(2, '2024-08-12', 25.00, 'Completed'),   -- Mouse
-(3, '2024-08-13', 150.00, 'Processing'), -- Office Chair
-(4, '2024-08-14', 50.00, 'Processing'),  -- Coffee Maker
-(5, '2024-08-15', 30.00, 'Processing');   -- Desk Lamp
+(1, '2026-01-10', 1225.00, 'Completed'), -- Laptop + Mouse
+(2, '2026-02-15', 150.00, 'Completed'),  -- Office Chair
+(3, '2026-03-20', 50.00, 'Completed'),   -- Coffee Maker
+(4, '2026-04-01', 30.00, 'Completed'),   -- Desk Lamp
+(5, '2026-04-15', 1200.00, 'Completed'), -- Laptop
+(1, '2026-05-01', 75.00, 'Completed'),   -- 3 x Mouse
+(2, '2026-05-10', 300.00, 'Completed'),  -- 2 x Office Chair
+(3, '2026-06-01', 100.00, 'Completed'),  -- 2 x Coffee Maker
+(4, '2026-06-15', 60.00, 'Completed'),   -- 2 x Desk Lamp
+(5, '2025-07-01', 1225.00, 'Completed'), -- Laptop + Mouse
+(1, '2025-07-10', 2400.00, 'Processing'), -- 2 x Laptop
+(2, '2025-07-15', 175.00, 'Shipped'),      -- Office Chair + Mouse
+(3, '2025-07-20', 80.00, 'Shipped'),   -- Coffee Maker + Desk Lamp
+(4, '2025-08-01', 50.00, 'Pending'),   -- Coffee Maker
+(5, '2025-08-05', 30.00, 'Pending'),      -- Desk Lamp
+(1, '2025-08-10', 1200.00, 'Completed'),  -- Laptop
+(2, '2025-08-12', 25.00, 'Completed'),   -- Mouse
+(3, '2025-08-13', 150.00, 'Processing'), -- Office Chair
+(4, '2025-08-14', 50.00, 'Processing'),  -- Coffee Maker
+(5, '2025-08-15', 30.00, 'Processing');   -- Desk Lamp
 
 -- Insert Data into Order Items Table
 -- Order 1
@@ -173,4 +173,4 @@ INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
 INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
 (20, 5, 1, 30.00);
 
-INSERT INTO user_gen_core(username, email, created_at) VALUES('testuser', 'testuser@gmail.com', '2024-08-11 12:00:00');
+INSERT INTO user_gen_core(username, email, created_at) VALUES('testuser', 'testuser@gmail.com', '2026-08-11 12:00:00');
