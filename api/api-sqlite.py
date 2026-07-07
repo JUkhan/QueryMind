@@ -27,9 +27,13 @@ from routes.schema_routes import *
 from routes.bot_routes import *
 from routes.core_routes import *
 
-# Create tables
+# Create tables and seed initial data on first boot
+from utils import seed_default_user, seed_sample_data
+
 with app.app_context():
     db.create_all()
+    seed_sample_data()
+    seed_default_user()
 
 if __name__ == '__main__':
     print('-'*40, end='')

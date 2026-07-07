@@ -11,10 +11,11 @@ def login():
     username = data.get('username')
     email = data.get('email')
     user = User.query.filter_by(username=username, email=email).first()
-    
-    if user.username==username:
+
+    if user is not None:
         return jsonify(user.to_dict())
-    return jsonify(None)
+    # No matching user — return 401 instead of crashing on a None lookup.
+    return jsonify({'error': 'Invalid username or email'}), 401
 
 
 # dashboard crud

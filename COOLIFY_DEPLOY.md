@@ -38,6 +38,15 @@ backend with relative `/api/` URLs, which nginx forwards to the internal
    | `DB_SYSTEM`      | optional        | `sqlite` (default), `postgres`, or `mssql`.       |
    | `DATABASE_URL`   | postgres/mssql  | Connection string (see `api/.env.example`).       |
    | `SCHEMA`         | optional        | Schema name for postgres/mssql.                   |
+   | `SEED_USERNAME`  | optional        | Initial login username (default `testuser`).      |
+   | `SEED_EMAIL`     | optional        | Initial login email (default `testuser@gmail.com`).|
+   | `SEED_SAMPLE_DATA`| optional       | `1` (default) loads demo data from `sample_data.sql`; `0` to skip. |
+
+   On first boot with an empty database the API seeds one login user so you can
+   sign in immediately. The app has no self-registration and no passwords —
+   login just matches `username` + `email`. **Log in with the seeded values**
+   (default `testuser` / `testuser@gmail.com`, or whatever you set above), then
+   change/add users as needed. Set `SEED_DEFAULT_USER=0` to disable seeding.
 
    With `DB_SYSTEM=sqlite` (default) no `DATABASE_URL` is needed — the SQLite
    file is stored on the `querymind-data` volume and survives redeploys.
