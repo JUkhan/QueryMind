@@ -1,22 +1,72 @@
+# docker-compose for Hostinger Coolify
+#
+# Coolify builds both images from their Dockerfiles and routes public traffic
+# through its built-in proxy (Traefik/Caddy) — you do NOT publish host ports.
+#
+# Only the `angular` service is exposed to the internet. The Angular app calls
+# the backend with relative `/api/` URLs, which nginx proxies to the internal
+# `api` service, so the API never needs a public domain.
+#
+# The `SERVICE_FQDN_ANGULAR_80` magic variable tells Coolify to generate a
+# domain and route it to port 80 of the angular container. Set/override the
+# actual domain in the Coolify UI (Service -> Domains).
+
 services:
   angular:
     build:
       context: ./angular
       dockerfile: Dockerfile
-    ports:
-      - "4200:80"
+    environment:
+      # Coolify replaces this with the generated/assigned public URL.
+      - SERVICE_FQDN_ANGULAR_80
+    expose:
+      - "80"
     networks:
       - app-network
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:80/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
+    environment:
+      # Set these as environment variables / secrets in the Coolify UI.
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - DB_SYSTEM=${DB_SYSTEM:-sqlite}
+      # Only needed for postgres/mssql. Ignored when DB_SYSTEM=sqlite.
+      - DATABASE_URL=${DATABASE_URL:-}
+      - SCHEMA=${SCHEMA:-}
+      # Persist the SQLite database on the mounted volume below.
+      - SQLITE_PATH=/app/data/database.db
+    expose:
+      - "5000"
+    volumes:
+      # Named volume keeps the SQLite DB across redeploys.
+      - querymind-data:/app/data
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/')\" || exit 1"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  querymind-data:

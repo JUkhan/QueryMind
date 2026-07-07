@@ -2,3 +2,9 @@ venv
 .git
 .gitignore
 __pycache__
+# Never bake local secrets into the image — provide them via Coolify env vars.
+.env
+.env.*
+!.env.example
+# Local dev SQLite DB — the container uses the mounted volume instead.
+instance/

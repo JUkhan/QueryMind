@@ -5,7 +5,13 @@ from database import db
 
 # Configure SQLAlchemy
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] =  f'sqlite:///{os.path.join(basedir, "database.db")}'
+# SQLITE_PATH lets deployments (e.g. Coolify) point the DB at a persistent
+# volume. Defaults to the local file for development.
+db_path = os.getenv('SQLITE_PATH', os.path.join(basedir, "database.db"))
+db_dir = os.path.dirname(db_path)
+if db_dir:
+    os.makedirs(db_dir, exist_ok=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,  # Verify connections before use
