@@ -66,6 +66,7 @@ export class BarChartComponent implements OnInit {
 
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
       y: {
         beginAtZero: true
@@ -150,7 +151,7 @@ export class BarChartComponent implements OnInit {
     // Apply chart configuration options
     this.barChartOptions = {
       responsive: config.responsive !== false,
-      maintainAspectRatio: config.maintainAspectRatio !== false,
+      maintainAspectRatio: false,
       animation: config.animationEnabled !== false ? {
         duration: config.animationDuration || 1000,
         easing: config.animationEasing || 'easeOutQuad'

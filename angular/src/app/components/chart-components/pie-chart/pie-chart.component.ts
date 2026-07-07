@@ -60,6 +60,7 @@ export class PieChartComponent implements OnInit {
 
   public pieChartOptions: ChartConfiguration['options'] = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: true,
@@ -138,7 +139,7 @@ export class PieChartComponent implements OnInit {
   private applyChartConfig(config: any): void {
     this.pieChartOptions = {
       responsive: config.responsive !== false,
-      maintainAspectRatio: config.maintainAspectRatio !== false,
+      maintainAspectRatio: false,
       animation: config.animationEnabled !== false ? {
         duration: config.animationDuration || 1000,
         easing: config.animationEasing || 'easeOutQuad'

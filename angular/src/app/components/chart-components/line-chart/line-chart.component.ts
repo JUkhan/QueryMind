@@ -58,6 +58,8 @@ export class LineChartComponent implements OnInit {
   };
 
   public lineChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
     elements: {
       line: {
         tension: 0.5
@@ -194,7 +196,7 @@ export class LineChartComponent implements OnInit {
       //@ts-ignore
       pointStyle: config.pointStyle || 'circle',
       pointRadius: config.pointRadius || 3,
-      maintainAspectRatio: config.maintainAspectRatio !== false,
+      maintainAspectRatio: false,
       animation: config.animationEnabled !== false ? {
         duration: config.animationDuration || 1000,
         easing: config.animationEasing || 'easeOutQuad'

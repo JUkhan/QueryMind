@@ -1,5 +1,5 @@
-<div class="bg-white p-6 rounded-lg shadow-lg group">
-  <div class="flex justify-between items-center mb-4">
+<div class="bg-white p-6 rounded-lg shadow-lg group h-full flex flex-col overflow-hidden">
+  <div class="flex justify-between items-center mb-4 flex-shrink-0">
     <h3 class="text-lg font-semibold text-gray-900">{{ title() }}</h3>
     <div
       class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -116,7 +116,7 @@
   </div>
   }
 
-  <div class="overflow-x-auto">
+  <div class="overflow-x-auto overflow-y-auto flex-1 min-h-0">
     <table
       [ngClass]="{
         'min-w-full divide-y': true,

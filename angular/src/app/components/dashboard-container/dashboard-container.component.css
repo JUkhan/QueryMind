@@ -1,87 +1,100 @@
 /* Grid layout styles */
 ktd-grid {
+  display: block;
   background-color: transparent;
   min-height: 400px;
 }
 
-/* Grid items - Make chart containers fill the grid item */
+/*
+ * NOTE: @katoid/angular-grid-layout positions each ktd-grid-item host with
+ * INLINE styles (transform: translate(x, y), width, height, display, transition).
+ * Do NOT set transform / display / width / height / transition on the host here
+ * or you fight those inline styles. Only add non-conflicting visuals.
+ */
 ktd-grid-item {
-  display: flex;
-  flex-direction: column;
   background-color: transparent;
-  transition: transform 0.2s ease-in-out;
 }
 
-ktd-grid-item > * {
+/* Projected content fills the whole grid item so the card matches the cell size.
+   Exclude the library's resize grip (.grid-item-resize-icon) so it keeps its size. */
+ktd-grid-item > *:not(.grid-item-resize-icon) {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
-/* Drag handle visible on hover */
+/* The component host elements are inline/auto-height by default, which would
+   break the h-full chain down to the card. Force them to fill the tile so each
+   card (and its chart/table) sizes to the grid cell. */
+ktd-grid-item app-line-chart,
+ktd-grid-item app-bar-chart,
+ktd-grid-item app-pie-chart,
+ktd-grid-item app-table-component {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Hover elevation — box-shadow only (a transform here would override katoid's
+   inline positioning transform and make the tile jump). */
 ktd-grid-item:hover {
-  cursor: move;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  transform: translateY(-2px);
 }
 
 /* Dragging state */
 ktd-grid-item.ktd-grid-item-dragging {
-  opacity: 0.5;
+  opacity: 0.7;
   z-index: 1000;
 }
 
 /* Resizing state */
 ktd-grid-item.ktd-grid-item-resizing {
-  opacity: 0.8;
+  opacity: 0.9;
   z-index: 999;
 }
 
-/* Placeholder during drag */
-.ktd-grid-item-placeholder {
+/* Placeholder shown while dragging / resizing */
+::ng-deep .ktd-grid-item-placeholder {
   background-color: rgba(59, 130, 246, 0.2);
   border: 2px dashed rgba(59, 130, 246, 0.5);
   border-radius: 0.5rem;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.15s ease-in-out;
 }
 
-/* Resize handles */
-.ktd-grid-resize-handle {
+/*
+ * Resize grip.
+ * The real element rendered by katoid is <div class="grid-item-resize-icon">,
+ * NOT ".ktd-grid-resize-handle-*". It lives inside the library's own
+ * (encapsulated) view, so it must be reached with ::ng-deep from here.
+ * We enlarge the hit area, keep it above the chart/table content, and force the
+ * resize cursor so EVERY tile — including the ones in the last column — can be
+ * grabbed at the bottom-right corner.
+ */
+::ng-deep ktd-grid-item .grid-item-resize-icon {
+  width: 28px !important;
+  height: 28px !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  z-index: 30 !important;
+  cursor: se-resize !important;
+  pointer-events: auto !important;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+/* Reveal the grip on hover so users can see where to resize */
+::ng-deep ktd-grid-item:hover .grid-item-resize-icon {
+  opacity: 1;
+}
+
+/* Clearer arrow glyph for the grip */
+::ng-deep ktd-grid-item .grid-item-resize-icon::after {
+  content: "";
   position: absolute;
-  background-color: rgba(59, 130, 246, 0.6);
-  transition: background-color 0.2s ease-in-out;
-}
-
-.ktd-grid-resize-handle:hover {
-  background-color: rgba(59, 130, 246, 0.9);
-}
-
-/* Bottom-right resize handle */
-.ktd-grid-resize-handle-bottomright {
-  bottom: 0;
-  right: 0;
-  width: 20px;
-  height: 20px;
-  cursor: nwse-resize;
-}
-
-/* Bottom resize handle */
-.ktd-grid-resize-handle-bottom {
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 10px;
-  cursor: ns-resize;
-}
-
-/* Right resize handle */
-.ktd-grid-resize-handle-right {
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 10px;
-  height: 40px;
-  cursor: ew-resize;
+  right: 5px;
+  bottom: 5px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid rgba(59, 130, 246, 0.9);
+  border-bottom: 2px solid rgba(59, 130, 246, 0.9);
 }
