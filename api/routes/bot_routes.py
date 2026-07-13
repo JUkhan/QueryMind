@@ -7,13 +7,18 @@ from utils import extract_sql
 
 @app.route('/api/chatbot', methods=['POST'])
 def chat():
-    user_input = request.json.get('user_input')
-    thread_id = request.json.get('thread_id')
-    if not user_input:
-        return jsonify({"error": "user_input is required"}), 400
-    
-    response = run_chatbot(user_input, thread_id)
-    return jsonify({"response": response})
+    try:
+        user_input = request.json.get('user_input')
+        thread_id = request.json.get('thread_id')
+        if not user_input:
+            return jsonify({"error": "user_input is required"}), 400
+
+        response = run_chatbot(user_input, thread_id)
+        return jsonify({"response": response})
+
+    except Exception as e:
+        print(f'Error: {str(e)}')
+        return jsonify({'error': 'Failed to generate a response.', 'detail': str(e)}), 500
 
 @app.route("/api/get-bot-messages/<thread_id>")
 def get_bot_messages(thread_id):
