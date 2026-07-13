@@ -11,5 +11,5 @@ import { ChatComponent } from './components/chat/chat.component';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Flask Angular App';
+  title = 'QueryMind';
 }
