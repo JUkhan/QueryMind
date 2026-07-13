@@ -18,9 +18,9 @@ services:
       dockerfile: Dockerfile
     environment:
       # Coolify replaces this with the generated/assigned public URL.
-      - SERVICE_FQDN_ANGULAR_80
+      - SERVICE_FQDN_ANGULAR_800
     expose:
-      - "80"
+      - "800"
     networks:
       - app-network
     depends_on:
@@ -28,7 +28,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:80/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:800/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5
