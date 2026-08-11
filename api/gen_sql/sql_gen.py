@@ -35,7 +35,7 @@ from gen_sql.schema import (
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-MODEL_NAME = os.getenv('GEN_SQL_MODEL', 'gemini-3.5-flash')
+MODEL_NAME = os.getenv('GEN_SQL_MODEL', 'gemini-3.5-flash-lite')
 
 # Messages retained per thread. The window is always cut back to a HumanMessage
 # so a tool call never gets separated from its result (Gemini rejects that).
