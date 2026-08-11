@@ -12,6 +12,9 @@ def chat():
         thread_id = request.json.get('thread_id')
         if not user_input:
             return jsonify({"error": "user_input is required"}), 400
+        # Without a thread_id every caller shared one conversation.
+        if not thread_id:
+            return jsonify({"error": "thread_id is required"}), 400
 
         response = run_chatbot(user_input, thread_id)
         return jsonify({"response": response})
@@ -32,12 +35,15 @@ def get_bot_messages(thread_id):
     
 @app.route("/api/get-query-result", methods=['POST'])
 def get_query_result():
+    sql = None
     try:
         user_input = request.json.get('user_input')
         thread_id = request.json.get('thread_id')
         if not user_input:
             return jsonify({"error": "user_input is required"}), 400
-        
+        if not thread_id:
+            return jsonify({"error": "thread_id is required"}), 400
+
         chat_res = run_chatbot(user_input, thread_id)
         has_sql, sql = extract_sql(chat_res)
         if not has_sql:

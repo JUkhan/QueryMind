@@ -1,8 +1,12 @@
 import os
 import re
 
+# Absolute so the schema is found regardless of the process working directory.
+SCHEMA_FILE = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'schema.txt')
 
-def update_table_description(table_name: str, new_description: str, schema_file = 'schema.txt') -> bool:
+
+def update_table_description(table_name: str, new_description: str, schema_file = SCHEMA_FILE) -> bool:
     """
     Updates the description for a given table in the schema.txt file.
 
@@ -68,7 +72,7 @@ def update_table_description(table_name: str, new_description: str, schema_file 
 
     return False
 
-def update_column_description(table_name: str, column_name: str, new_description: str, schema_file = 'schema.txt') -> bool:
+def update_column_description(table_name: str, column_name: str, new_description: str, schema_file = SCHEMA_FILE) -> bool:
     """
     Updates the description for a given column in a table in the schema.txt file.
 
@@ -138,7 +142,7 @@ def update_column_description(table_name: str, column_name: str, new_description
 
     return False
 
-def append_to_file(content, file_path='schema.txt', newline=True):
+def append_to_file(content, file_path=SCHEMA_FILE, newline=True):
     """
     Append content to a file.
     
@@ -169,7 +173,7 @@ def append_to_file(content, file_path='schema.txt', newline=True):
         return False
 
 
-def get_schema(fileName='schema.txt'):
+def get_schema(fileName=SCHEMA_FILE):
     with open(fileName, 'r', encoding='utf-8') as file:
         schema = file.read()
     return schema
@@ -195,12 +199,16 @@ def extract_table_names(schemas):
         line = line.strip()
         if line.lower().startswith('table:'):
             # Extract the table name (everything after "Table: ")
-            nextLine=lines[idx+1].strip()
+            # The file can end on a "Table:" line, so guard the lookahead.
+            nextLine = lines[idx+1].strip() if idx + 1 < len(lines) else ''
             table_name = line[6:].strip()
-            if nextLine.startswith('Description:'):
-                if column_description:
+            # Flush before appending: the pending comments belong to the table
+            # that is ending, not to the one starting on this line.
+            if column_description:
+                if table_names:
                     table_names[-1] =f'{table_names[-1]}. It also have some columns description:  {'., '.join(column_description)}'
-                    column_description.clear()
+                column_description.clear()
+            if nextLine.startswith('Description:'):
                 table_names.append(f'{table_name} - {nextLine[12:].strip()}')
             else:
                 table_names.append(f'{table_name} - ')
@@ -211,7 +219,9 @@ def extract_table_names(schemas):
                 if comment:
                     column_description.append(comment)
     if column_description:
-        table_names[-1] =f'{table_names[-1]}. It also have some columns description: {'., '.join(column_description)}'
+        # A ' - ' comment can precede the first "Table:" line; it belongs to no table.
+        if table_names:
+            table_names[-1] =f'{table_names[-1]}. It also have some columns description: {'., '.join(column_description)}'
         column_description.clear()
 
     

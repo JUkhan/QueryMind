@@ -48,3 +48,7 @@ angular/.vscode/extensions.json
 angular/.vscode/settings.json
 api/.env.development.local
 api/.env
+
+# LangGraph conversation checkpoints (CHECKPOINT_DB)
+api/checkpoints.db
+api/checkpoints.db-*

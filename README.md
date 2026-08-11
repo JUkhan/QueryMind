@@ -165,7 +165,9 @@ The AI pipeline (`api/gen_sql/sql_gen.py`) is a LangGraph `StateGraph` with two 
 - **`agent`** — Gemini model with tool binding; generates SQL from natural language
 - **`tools`** — Calls `get_schema_detail` to fetch relevant schema context on demand
 
-Conversations are keyed by `thread_id` using an in-memory saver (resets on restart). History is trimmed at 10 messages to control context length.
+Conversations are keyed by `thread_id`, which every request must supply, and are checkpointed to a SQLite file so they survive worker restarts (set `CHECKPOINT_DB` to place it on a persistent volume; it falls back to an in-memory saver if the SQLite checkpointer is unavailable). History is trimmed to roughly the last 20 messages, always cutting at a user turn so a tool call is never separated from its result.
+
+Two control words are handled in the `agent` node: `new conversation` clears the thread, and `retry` re-asks the previous question with the rest of the history discarded.
 
 SQL is extracted from AI responses using a regex that matches ` ```sql `, ` ```sqlite `, or ` ```postgresql ` fenced code blocks.
 

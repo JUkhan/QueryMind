@@ -1,8 +1,8 @@
 # gunicorn.conf.py
 bind = "0.0.0.0:5000"
-# Keep 1 worker: conversation state lives in an in-process InMemorySaver
-# (see gen_sql/sql_gen.py). Multiple workers would fragment chat history
-# across processes. Scaling out needs a shared checkpointer first.
+# Keep 1 worker: chat history is checkpointed to a local SQLite file
+# (see gen_sql/sql_gen.py), which survives worker restarts but is not safe for
+# concurrent writers. Scaling out needs a shared checkpointer (e.g. Postgres).
 workers = 1
 worker_class = "sync"
 worker_connections = 1000
