@@ -18,6 +18,7 @@ from langchain_core.messages import (
     SystemMessage,
     ToolMessage,
 )
+from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.errors import GraphRecursionError
@@ -32,6 +33,7 @@ from gen_sql.schema import (
     extract_table_names,
     filter_schemas_by_table_names,
 )
+from gen_sql.usage import UsageTracker, find_tracker
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -107,7 +109,7 @@ class TableSelection(BaseModel):
 
 
 @tool
-def get_schema_detail(query_description: str) -> str:
+def get_schema_detail(query_description: str, config: RunnableConfig = None) -> str:
     """This is a schema detail function that generates appropriate schema based on the query description"""
 
     schema, table_summary = load_schema()
@@ -128,9 +130,12 @@ def get_schema_detail(query_description: str) -> str:
 
     # Structured output instead of parsing prose: a preamble like "Here are the
     # tables: orders" used to be split on ',' and silently match nothing.
+    # config is injected by the tool runtime, never by the model. Forwarding it
+    # is what puts this call under the run's callbacks: without it the schema
+    # lookup's tokens go uncounted, one missing call per lookup.
     try:
         selection = get_llm().with_structured_output(TableSelection).invoke(
-            [system_message, human_message])
+            [system_message, human_message], config=config)
     except Exception as exc:
         print(f'Table selection failed: {exc}')
         return 'The schema lookup failed. Ask the user to try again.'
@@ -202,7 +207,7 @@ def last_question(messages):
     return None
 
 
-def agent(state: State):
+def agent(state: State, config: RunnableConfig = None):
     messages = list(state['messages'])
     last = messages[-1] if messages else None
     # isinstance first: Gemini returns list content, which has no .strip().
@@ -228,6 +233,10 @@ def agent(state: State):
         start = window_start(messages)
         dropped = [RemoveMessage(id=m.id) for m in messages[:start] if m.id]
         messages = messages[start:]
+        if start:
+            tracker = find_tracker(config)
+            if tracker:
+                tracker.note_trim(start)
 
     response = get_tools_model().invoke([('system', system_prompt())] + messages)
     return {'messages': dropped + [response]}
@@ -287,15 +296,22 @@ graph.add_edge('tools', 'agent')
 graph_app = graph.compile(checkpointer=build_checkpointer())
 
 
-def thread_config(thread_id):
+def thread_config(thread_id, callbacks=None):
     if not thread_id:
         # Defaulting to a shared id put every client without a thread into one
         # conversation, leaking history between users.
         raise ValueError('thread_id is required')
-    return {
+    config = {
         'configurable': {'thread_id': str(thread_id)},
         'recursion_limit': RECURSION_LIMIT,
     }
+    if callbacks:
+        # Run level: LangChain hands these down to every LLM call the run makes,
+        # including the one inside get_schema_detail once the tool forwards its
+        # config. Kept out of 'configurable' because that is checkpointed and a
+        # handler does not serialise.
+        config['callbacks'] = list(callbacks)
+    return config
 
 
 def rollback_turn(config):
@@ -357,7 +373,8 @@ def get_messages(thread_id):
 
 
 def run_chatbot(user_input, thread_id):
-    config = thread_config(thread_id)
+    tracker = UsageTracker(thread_id)
+    config = thread_config(thread_id, callbacks=[tracker])
     # Only the new message goes in: the checkpointer restores the rest, and
     # re-sending the stored list made every trim silently reappear.
     try:
@@ -371,17 +388,25 @@ def run_chatbot(user_input, thread_id):
         # turn (rate limit, network) does not leave an unanswered message behind.
         rollback_turn(config)
         raise
+    finally:
+        # An abandoned turn still spent its tokens, and a turn that burned the
+        # recursion limit spent the most of any.
+        tracker.log()
 
     return message_text(response['messages'][-1])
 
 
 def run_chatbot_test(user_input, thread_id):
     """Local debugging helper: streams each step and returns the final text."""
-    config = thread_config(thread_id)
+    tracker = UsageTracker(thread_id, label='test')
+    config = thread_config(thread_id, callbacks=[tracker])
     output = ''
-    for step in graph_app.stream({'messages': [HumanMessage(user_input)]},
-                                 config, stream_mode='values'):
-        message = step['messages'][-1]
-        output = message_text(message)
-        message.pretty_print()
+    try:
+        for step in graph_app.stream({'messages': [HumanMessage(user_input)]},
+                                     config, stream_mode='values'):
+            message = step['messages'][-1]
+            output = message_text(message)
+            message.pretty_print()
+    finally:
+        tracker.log()
     return output
